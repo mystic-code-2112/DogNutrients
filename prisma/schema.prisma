@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// Dog Profiles
+// ─────────────────────────────────────────────
+model Dog {
+  id               String        @id @default(cuid())
+  name             String
+  breed            String?
+  weightKg         Float
+  ageMonths        Int
+  sex              Sex
+  lifeStage        LifeStage
+  isNeutered       Boolean       @default(false)
+  activityLevel    ActivityLevel @default(MODERATE)
+  healthConditions String[]
+  notes            String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  recipes Recipe[]
+
+  @@map("dogs")
+}
+
+enum Sex {
+  MALE
+  FEMALE
+}
+
+enum LifeStage {
+  PUPPY_UNDER_4MO
+  PUPPY_OVER_4MO
+  ADULT
+  SENIOR
+  PREGNANT
+  LACTATING
+}
+
+enum ActivityLevel {
+  SEDENTARY
+  LESS_ACTIVE
+  MODERATE
+  ACTIVE
+  WORKING
+  HIGHLY_ACTIVE
+}
+
+// ─────────────────────────────────────────────
+// Recipes
+// ─────────────────────────────────────────────
+model Recipe {
+  id            String        @id @default(cuid())
+  dogId         String
+  name          String
+  description   String?
+  batchSizeG    Float         @default(1000)
+  cookingMethod CookingMethod @default(RAW)
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  dog   Dog          @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  items RecipeItem[]
+
+  @@index([dogId])
+  @@map("recipes")
+}
+
+enum CookingMethod {
+  RAW
+  LIGHTLY_COOKED
+  FULLY_COOKED
+  PRESSURE_COOKED
+}
+
+// ─────────────────────────────────────────────
+// Recipe Line Items
+// ─────────────────────────────────────────────
+model RecipeItem {
+  id           String   @id @default(cuid())
+  recipeId     String
+  ingredientId String?
+  weightG      Float
+  isCooked     Boolean  @default(false)
+  notes        String?
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  recipe     Recipe      @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient Ingredient? @relation(fields: [ingredientId], references: [id])
+
+  @@index([recipeId])
+  @@map("recipe_items")
+}
+
+// ─────────────────────────────────────────────
+// Ingredient Cache (mirrors USDA FDC data)
+// ─────────────────────────────────────────────
+model Ingredient {
+  id           String      @id
+  fdcId        Int         @unique
+  description  String
+  dataType     FdcDataType
+  foodCategory String?
+  moisturePct  Float?
+  isCooked     Boolean     @default(false)
+  cachedAt     DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  nutrients   IngredientNutrient[]
+  recipeItems RecipeItem[]
+
+  @@index([description])
+  @@map("ingredients")
+}
+
+enum FdcDataType {
+  SR_LEGACY
+  FOUNDATION
+  SURVEY_FNDDS
+  BRANDED
+}
+
+// ─────────────────────────────────────────────
+// Per-ingredient nutrient values (per 100g as-fed)
+// ─────────────────────────────────────────────
+model IngredientNutrient {
+  id           String @id @default(cuid())
+  ingredientId String
+  nutrientId   Int
+  nutrientName String
+  amount       Float
+  unitName     String
+
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  @@unique([ingredientId, nutrientId])
+  @@index([ingredientId])
+  @@index([nutrientId])
+  @@map("ingredient_nutrients")
+}
+
+// ─────────────────────────────────────────────
+// Search Cache (USDA search results, TTL 7 days)
+// ─────────────────────────────────────────────
+model SearchCache {
+  id        String   @id @default(cuid())
+  query     String   @unique
+  results   Json
+  createdAt DateTime @default(now())
+
+  @@index([query])
+  @@map("search_cache")
+}
