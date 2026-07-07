@@ -18,6 +18,40 @@ A web app for building and analyzing **home-cooked dog food recipes** against ve
 
 ---
 
+## Screenshots
+
+### Dog profile
+
+Set up each dog with the details that drive their daily energy needs — weight, age, sex, life stage, activity level, neuter status, and health notes.
+
+![Dog profile page](docs/screenshots/1-dog-profile.png)
+
+### Recipe builder & macro analysis
+
+Add ingredients and adjust weights on the left; the analysis panel on the right updates live with batch energy, the dog's daily energy requirement (DER), days per batch, AAFCO issues, and caloric distribution across protein, fat, and carbs.
+
+![Recipe builder showing macros](docs/screenshots/2-macros.png)
+
+### Mineral compliance
+
+Every nutrient is checked against AAFCO min/max on a per-1000-kcal basis, with dry-matter percentage, batch totals, and daily amounts. Color coding flags anything deficient, excessive, or borderline — including the calcium-to-phosphorus ratio.
+
+![Mineral analysis table](docs/screenshots/3-minerals.png)
+
+### Missing-data transparency
+
+When the USDA record doesn't report a nutrient, the app tells you exactly which values were assumed to be zero — so you always know how complete your analysis really is.
+
+![Missing nutrient data detail](docs/screenshots/4-missing-nutrients.png)
+
+### Compare ingredients
+
+Line up to five ingredients side by side to see full nutritional profiles per 100 g — handy for swapping one protein or organ meat for another.
+
+![Ingredient comparison page](docs/screenshots/5-compare-ingredients.png)
+
+---
+
 ## Tech stack
 
 | Layer | Technology |
