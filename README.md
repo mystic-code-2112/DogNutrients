@@ -178,4 +178,4 @@ This tool is for **educational and informational purposes only** and is not a su
 
 ## License
 
-This project is currently private/unlicensed. Add a license file if you intend to make it open source.
+Released under the [MIT License](LICENSE) — you're free to use, modify, and distribute this code, provided the copyright notice is retained.
